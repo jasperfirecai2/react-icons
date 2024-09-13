@@ -8,6 +8,13 @@ export interface IconTree {
   child: IconTree[];
 }
 
+export interface IconLicense {
+  name: string;
+  license: string;
+  licenseUrl: string;
+  projectUrl: string;
+}
+
 function Tree2Element(tree: IconTree[]): React.ReactElement[] {
   return (
     tree &&
@@ -15,15 +22,17 @@ function Tree2Element(tree: IconTree[]): React.ReactElement[] {
       React.createElement(
         node.tag,
         { key: i, ...node.attr },
-        Tree2Element(node.child)
-      )
+        Tree2Element(node.child),
+      ),
     )
   );
 }
-export function GenIcon(data: IconTree) {
+
+export function GenIcon(license: IconLicense, data: IconTree) {
+  const license_attr = {"aria-details": `Icon by ${license.name} (${license.projectUrl}) under the ${license.license} license. url: ${license.licenseUrl}`};
   // eslint-disable-next-line react/display-name
   return (props: IconBaseProps) => (
-    <IconBase attr={{ ...data.attr }} {...props}>
+    <IconBase attr={{ ...license_attr, ...data.attr }} {...props} >
       {Tree2Element(data.child)}
     </IconBase>
   );
@@ -38,7 +47,7 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
 
 export type IconType = (props: IconBaseProps) => JSX.Element;
 export function IconBase(
-  props: IconBaseProps & { attr?: Record<string, string> }
+  props: IconBaseProps & { attr?: Record<string, string> },
 ): JSX.Element {
   const elem = (conf: IconContext) => {
     const { attr, size, title, ...svgProps } = props;
